@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>タロットおみくじ画像作成</title>
+  <style>
+    body {
+      text-align: center;
+      font-family: Arial, sans-serif;
+    }
+    canvas {
+      border: 1px solid #ccc;
+      margin-top: 10px;
+      max-width: 100%;
+    }
+    .input-box {
+      margin: 20px 0;
+    }
+    textarea {
+      width: 80%;
+      height: 50px;
+    }
+  </style>
+</head>
+<body>
+  <h1>タロットおみくじ画像作成</h1>
+
+  <label for="categorySelect">おみくじの種類:</label>
+  <select id="categorySelect">
+    <option value="仕事運">仕事運</option>
+    <option value="恋愛運">恋愛運</option>
+    <option value="対人運">対人運</option>
+    <option value="総合運">総合運</option>
+  </select>
+
+  <div class="input-box">
+    <label>結果:</label>
+    <textarea id="resultInput" placeholder="結果を入力..."></textarea>
+  </div>
+
+  <div class="input-box">
+    <label>意味・アドバイス:</label>
+    <textarea id="adviceInput" placeholder="意味やアドバイスを入力..."></textarea>
+  </div>
+
+  <div class="input-box">
+    <label>贈る言葉:</label>
+    <textarea id="messageInput" placeholder="贈る言葉を入力..."></textarea>
+  </div>
+
+  <button onclick="generateImage()">作成</button>
+  <br>
+  <canvas id="outputCanvas" width="1080" height="1350"></canvas>
+  <br>
+
+  <script>
+    function wrapText(ctx, text, x, y, maxWidth, lineHeight) {
+      let lines = [];
+      let words = text.split('');
+      let line = '';
+      
+      for (let word of words) {
+        let testLine = line + word;
+        let testWidth = ctx.measureText(testLine).width;
+        if (testWidth > maxWidth && line !== '') {
+          lines.push(line);
+          line = word;
+        } else {
+          line = testLine;
+        }
+      }
+      lines.push(line);
+      
+      lines.forEach((l, index) => {
+        ctx.fillText(l, x, y + index * lineHeight);
+      });
+    }
+
+    function generateImage() {
+      const canvas = document.getElementById("outputCanvas");
+      const ctx = canvas.getContext("2d");
+      const category = document.getElementById("categorySelect").value;
+      const result = document.getElementById("resultInput").value;
+      const advice = document.getElementById("adviceInput").value;
+      const message = document.getElementById("messageInput").value;
+
+      const bgImage = new Image();
+      bgImage.src = "tarot.png";
+      bgImage.onload = function () {
+        ctx.drawImage(bgImage, 0, 0, canvas.width, canvas.height);
+        ctx.font = "36px serif";
+        ctx.fillStyle = "#8B0000"; // 深い濃い赤
+        ctx.textAlign = "center";
+        ctx.fillText(category, canvas.width / 2, 200);
+        wrapText(ctx, result, canvas.width / 2, 350, 700, 40);
+        wrapText(ctx, "意味・アドバイス:", canvas.width / 2, 500, 700, 40);
+        wrapText(ctx, advice, canvas.width / 2, 550, 700, 40);
+        wrapText(ctx, "贈る言葉:", canvas.width / 2, 850, 700, 40);  // 位置を下げた
+        wrapText(ctx, message, canvas.width / 2, 900, 700, 40);
+      };
+    }
+  </script>
+</body>
+</html>
